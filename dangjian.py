@@ -266,7 +266,6 @@ def submit(url, data=None):
     time.sleep(2)
 def main():
 
-    cookies = login()
     cms()
     bbs()
     view()
@@ -277,4 +276,5 @@ def main():
 
 if __name__ == "__main__":
     
+    cookies = login()
     main()
