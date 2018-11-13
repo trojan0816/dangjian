@@ -159,6 +159,16 @@ study = [
 ]
 
 # =====================================================
+# 答题 
+# =====================================================
+exam = [
+    API_HOST + '/official/exam/competition/begin',
+    API_HOST + '/official/exam/competition/order',
+    {'id' : '19'},
+    API_HOST + '/official/exam/ques/check'
+]
+
+# =====================================================
 # 签到
 # =====================================================
 
@@ -170,12 +180,15 @@ checkin = [
     }
 ]
 
-# cms,bbs,view,study,checkin模式类似，共用
+# cms,bbs,view,study,exam,checkin模式类似，共用
 def get_id(url, data):
-
     rs = s.post(url, data , headers= headers,cookies = cookies, verify = False)
-    ids = [i.get('id') for i in rs.json()['data']['list']]
-    return ids
+    if 'order' in url:    
+        answers = {i.get('id'):i.get('answer') for i in rs.json()['data']['list']}
+        return answers
+    else:
+        ids = [i.get('id') for i in rs.json()['data']['list']]
+        return ids
 
 def comment(url, id=None):
 
@@ -198,6 +211,13 @@ def comment(url, id=None):
         data = study[1]
     elif 'checkin' in url:
         data = checkin[1]
+    elif 'exam' in url:
+        data={
+            'answer_loc' : '2',
+            'bank_id' :	'19',
+            'question_id' : id,
+            'user_answer' : answers[id]
+        }
 
     s.post(url, data , headers= headers,cookies = cookies, verify = False)
     time.sleep(2)
@@ -216,12 +236,9 @@ def comment(url, id=None):
 # comment(study[0])  # 学习心得体会
 # print('学习心得体会完成')
 
+answers = get_id(exam[1], exam[2])  # 获取题库答案
+# [[comment(exam[3], id) for id in get_id(exam[0], exam[2])] for i in range(2)] # 答题2次
+# print('答题完成')
+
 # comment(checkin[0])  # 签到
 # print('签到完成')
-
-# 剩下的不会了。。。
-
-# =====================================================
-# 答题 
-# =====================================================
-# https://capi.dangjianwang.com/official/exam/competition/begin
