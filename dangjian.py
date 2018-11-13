@@ -10,7 +10,7 @@ s = requests.session()
 headers = {
     'Host': 'capi.dangjianwang.com',
     'Connection': 'keep-alive',
-    'Content-Length': '1467',
+    # 'Content-Length': '1467',
     'Accept': 'application/json, text/plain, */*',
     'Origin': 'https://www.dangjianwang.com',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) \
@@ -148,14 +148,22 @@ view = [
 # =====================================================
 
 study = [
-    API_HOST+'/official/study/comment/add',
+    API_HOST + '/official/study/comment/add',
     {
         'content' : '不忘初心，方得始终。中国共产党人的初心和使命，就是为中国人民谋幸福，\
             为中华民族谋复兴。这个初心和使命是激励中国共产党人不断前进的根本动力。\
             全党同志一定要永远与人民同呼吸、共命运、心连心，永远把人民对美好生活的向往作为奋斗目标，\
             以永不懈怠的精神状态和一往无前的奋斗姿态，继续朝着实现中华民族伟大复兴的宏伟目标奋勇前进。',
         'mid' : 'ad0bdd6d140a3aa05945f3b7d6b3a74b'  # 对应学习材料习近平在首届中国国际进口博览会开幕式上的主旨演讲（2018.11.5），不变
-    }
+    },
+    API_HOST + '/official/study/Common/endStudy',
+    {
+        'mid' : 'ad0bdd6d140a3aa05945f3b7d6b3a74b',
+        'type' : '1',
+        'web_time' : '303'
+    },
+    API_HOST + '/official/study/Common/startStudy',
+    API_HOST + '/official/ucenter/file/uptoken'
 ]
 
 # =====================================================
@@ -207,6 +215,13 @@ def comment(url, id=None):
         }
     elif 'view' in url:
         data = view[1]
+
+    elif 'uptoken' in url:
+        data = None
+    elif 'startStudy' in url:
+        data = None
+    elif 'endStudy' in url:
+        data = study[3]
     elif 'study' in url:
         data = study[1]
     elif 'checkin' in url:
@@ -235,6 +250,24 @@ def comment(url, id=None):
 
 # comment(study[0])  # 学习心得体会
 # print('学习心得体会完成')
+
+# comment(study[5])
+def uptokentest():
+    url = 'https://capi.dangjianwang.com/official/ucenter/file/uptoken'
+    rs = s.get(url, headers= headers, verify = False)
+# uptokentest()
+# print('发送uptoken')
+comment(study[4])
+print('发送start')
+time.sleep(65)
+for i in range(62):
+    print(i,end='\r')
+    time.sleep(1)
+comment(study[2])  # 在线学习
+print('发送end')
+# comment(study[4])
+# print('发送start')
+print('在线学习完成')
 
 answers = get_id(exam[1], exam[2])  # 获取题库答案
 # [[comment(exam[3], id) for id in get_id(exam[0], exam[2])] for i in range(2)] # 答题2次
