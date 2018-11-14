@@ -10,12 +10,9 @@ logging.basicConfig(level=logging.INFO)
 API_HOST = 'https://capi.dangjianwang.com'
 
 s = requests.session()
-# 通用headers
 headers = {
     'Host': 'capi.dangjianwang.com',
     'Connection': 'keep-alive',
-    # 'Content-Length': '1467',
-    # 'Accept': 'application/json, text/plain, */*',
     'Appid': '33beba686fd8333e',  # 无此项无法获取cookies
     'Origin': 'https://www.dangjianwang.com',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) \
@@ -33,35 +30,8 @@ headers = {
 def get_captcha():
 
     url = API_HOST + '/official/ucenter/login/preCaptcha'
-    # headers = {
-    #     'Host': 'capi.dangjianwang.com',
-    #     'Connection': 'keep-alive',
-    #     'Accept': 'application/json, text/javascript, */*; q=0.01',
-    #     'Origin': 'https://www.dangjianwang.com',
-    #     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) \
-    #     AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.26 \
-    #     Safari/537.36 Core/1.63.6735.400 QQBrowser/10.2.2614.400',
-    #     'Referer': 'https://www.dangjianwang.com/login',
-    #     'Accept-Encoding': 'gzip, deflate, br',
-    #     'Accept-Language': 'zh-CN,zh;q=0.9'
-    # }
     rs = s.get(url, headers= headers)
-    # data={
-    #     'captcha_token' : 'Ch62d1vosN'
-    #     'captcha_url' : 'https://capi.dangjianwang.com/official/ucenter/login/getCaptcha?captcha_token=Ch62d1vosN'
-    # }
     data = rs.json()['data']
-    # headers = {
-    #     'Host': 'capi.dangjianwang.com',
-    #     'Connection': 'keep-alive',
-    #     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) \
-    #     AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.26 \
-    #     Safari/537.36 Core/1.63.6735.400 QQBrowser/10.2.2614.400',
-    #     'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
-    #     'Referer': 'https://www.dangjianwang.com/login',
-    #     'Accept-Encoding': 'gzip, deflate, br',
-    #     'Accept-Language': 'zh-CN,zh;q=0.9'
-    # }
     rs = s.get(data['captcha_url'], headers= headers)
     logger.info('获取验证码成功')
     Image.open(io.BytesIO(rs.content)).show()
@@ -80,21 +50,6 @@ def login():
     print()
     captcha, ctoken = get_captcha()
     url = API_HOST + '/official/ucenter/login/index'
-    # headers ={
-    #     'Host': 'capi.dangjianwang.com',
-    #     'Connection': 'keep-alive',
-    #     'Content-Length': '85',
-    #     'Accept': 'application/json, text/javascript, */*; q=0.01',
-    #     'Origin': 'https://www.dangjianwang.com',
-    #     'Appid': '33beba686fd8333e',  # 无此项无法获取cookies
-    #     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) \
-    #     AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.26 \
-    #     Safari/537.36 Core/1.63.6735.400 QQBrowser/10.2.2614.400',
-    #     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    #     'Referer': 'https://www.dangjianwang.com/login',
-    #     'Accept-Encoding': 'gzip, deflate, br',
-    #     'Accept-Language': 'zh-CN,zh;q=0.9'
-    # }
     data = {
         'username' : name,
         'password' : pwd,
@@ -107,12 +62,13 @@ def login():
     logger.info('cookies : {}'.format(cookies))
     return cookies
 
-
 # =====================================================
 # 首页评论
 # =====================================================
+
 def cms():
 
+    logger.info('开始首页评论')
     url = API_HOST+'/official/cms/article/list'  # 获取article_id的url
     data = {
         'menu_id' :	'90d0ac07a626a7a6b39c246d6532f7bd',  # 首页时政标签id,不会变化
@@ -131,13 +87,13 @@ def cms():
         submit(url, data)
     logger.info('首页评论已完成')
 
-
 # =====================================================
 # 党员论坛
 # =====================================================
 
 def bbs():
 
+    logger.info('开始党员论坛回复')
     url = API_HOST+'/official/bbs/home/listBySys'  # 获取pid的url      
     data = {
         'page_index' :	'1',
@@ -156,12 +112,13 @@ def bbs():
         submit(url, data)
     logger.info('党员论坛回复已完成')
 
-
 # =====================================================
 # 党员视角
 # =====================================================
 
 def view():
+
+    logger.info('开始党员视角发布')
     url = API_HOST+'/official/view/View/publish'
     data = {
         'auth' : '0',
@@ -171,13 +128,13 @@ def view():
     [submit(url, data) for i in range(2)]
     logger.info('党员视角发布已完成')
 
-
 # =====================================================
 # 学习心得体会
 # =====================================================
 
 def study():
 
+    logger.info('开始学习心得体会')
     url = API_HOST + '/official/study/comment/add'
     data = {
         'content' : '不忘初心，方得始终。中国共产党人的初心和使命，就是为中国人民谋幸福，\
@@ -196,6 +153,7 @@ def study():
 
 def exam():
 
+    logger.info('开始答题')
     url = API_HOST + '/official/exam/competition/order'
     data = {'id' : '19'}
     answers = get_id(url, data)
@@ -212,6 +170,25 @@ def exam():
         submit(url, data)
     logger.info('答题已完成')
 
+# =====================================================
+# 下载题库
+# =====================================================
+
+def out_answers():
+
+    url = API_HOST + '/official/exam/competition/order'
+    data = {'id' : '19'}
+    rs = s.post(url, data, headers=headers, cookies=cookies)
+    with open('key.txt','w', encoding='utf-8') as f:
+        for i in rs.json()['data']['list']:
+            # print('{}、{}'.format(int(i['id'])-1985,i['content']))
+            # print('答案:')
+            f.write('{}、{}\n'.format(int(i['id'])-1985,i['content']))
+            f.write('答案：\n')
+            for x in i['answer'].split(','):
+                # print('{}、{}'.format(chr(int(x) + 65), i['options'][int(x)]['content']))
+                f.write('{}、{}\n'.format(chr(int(x) + 65), i['options'][int(x)]['content']))
+            f.write('\n')
 
 # =====================================================
 # 签到
@@ -219,6 +196,7 @@ def exam():
 
 def checkin():
 
+    logger.info('开始签到')
     url = API_HOST+'/official/ucenter/ucuser/checkin'
     data = {
         'client' : '2',
@@ -227,19 +205,19 @@ def checkin():
     submit(url, data)
     logger.info('签到已完成')
 
-
 # =====================================================
 # 在线学习时长 
 # =====================================================
 
 def study_time():
 
+    logger.info('开始在线学习时长')
     url = API_HOST + '/official/study/Common/startStudy'
     submit(url)
     for i in range(303, -1, -1):
-        print('还需要学习', end='')
-        print(' {}秒'.format(i), end='\r')
+        print('还需要继续学习{:0>3}秒'.format(i), end='\r')
         time.sleep(1)
+    print()
     url = API_HOST + '/official/study/Common/endStudy'
     data = {
         'mid' : 'ad0bdd6d140a3aa05945f3b7d6b3a74b',
@@ -248,7 +226,6 @@ def study_time():
     }
     submit(url, data)
     logger.info('在线学习时长已完成')
-
 
 def get_id(url, data):
 
@@ -264,6 +241,7 @@ def submit(url, data=None):
 
     s.post(url, data, headers=headers, cookies=cookies)
     time.sleep(2)
+
 def main():
 
     cms()
@@ -273,6 +251,7 @@ def main():
     [exam() for i in range(2)]
     checkin()
     study_time()
+    # out_answers()
 
 if __name__ == "__main__":
     
